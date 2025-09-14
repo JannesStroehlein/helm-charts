@@ -1,0 +1,20 @@
+Thank you for installing Umami!
+
+Umami URL (if no ingress): port-forward and open http://localhost:8080
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "umami.fullname" . }} 8080:{{ .Values.service.port }}
+
+Database:
+  - Using Bitnami PostgreSQL at: {{ include "umami.pgHost" . }}.{{ .Release.Namespace }}.svc.cluster.local:5432
+  - App user: {{ default "umami" .Values.postgresql.auth.username }}
+  - DB name:  {{ default "umami" .Values.postgresql.auth.database }}
+  - Superuser 'postgres' remote access: {{ ternary "DISABLED" "ENABLED" (not .Values.postgresql.auth.enablePostgresUser) }}
+
+Secret references:
+  - App user password & DATABASE_URL:
+      Secret: {{ include "umami.pgAuthSecretName" . }}
+      Keys:   password, database-url
+  - APP_SECRET:
+      Secret: {{ include "umami.fullname" . }}-env
+      Key:    app-secret
+
+Default Umami login (first run): admin / umami

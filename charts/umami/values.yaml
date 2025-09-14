@@ -1,0 +1,82 @@
+# -- Container image for Umami (PostgreSQL variant)
+image:
+  repository: docker.umami.is/umami-software/umami
+  tag: postgresql-latest
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: umami.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  # - secretName: umami-tls
+  #   hosts:
+  #     - umami.local
+
+resources: {}
+#  limits:
+#    cpu: 200m
+#    memory: 512Mi
+#  requests:
+#    cpu: 100m
+#    memory: 256Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+umami:
+  # Leave empty to auto-generate a strong APP_SECRET on first install
+  appSecret: ""
+  # Extra environment variables for the container
+  extraEnv: []
+
+# --- Database options ---
+
+# A) Deploy Bitnami PostgreSQL subchart (default)
+postgresql:
+  enabled: true
+  auth:
+    # Create a non-superuser default app user and DB
+    enablePostgresUser: false   # disables remote/superuser 'postgres' account
+    username: umami
+    database: umami
+    # IMPORTANT: this chart will generate the password Secret for the app user
+    # and feed it to the subchart via 'existingSecret' below.
+    # You can change the name if you prefer.
+    existingSecret: umami-pg-auth
+    # Keys expected in the Secret:
+    #  - password: <app user password>
+    # (Optional replication/admin keys are not needed for standalone)
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+      # Make storage class configurable:
+      # Set to a StorageClass name (e.g., "fast-ssd"), to "-" to disable
+      # dynamic provisioning, or leave empty to use the cluster default.
+      storageClass: ""
+
+# B) Use an external PostgreSQL instead of deploying one
+externalDatabase:
+  enabled: false
+  host: ""
+  port: 5432
+  user: "umami"
+  database: "umami"
+  # Provide either a plain password OR reference an existing secret
+  password: ""
+  existingSecret:
+    name: ""
+    key: ""   # key containing the password in the referenced Secret

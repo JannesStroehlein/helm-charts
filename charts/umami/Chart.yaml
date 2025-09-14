@@ -1,0 +1,12 @@
+apiVersion: v2
+name: umami
+description: A Helm chart to deploy Umami (analytics) with PostgreSQL via Bitnami subchart.
+type: application
+version: 0.2.0
+appVersion: "2.19.0"
+
+dependencies:
+  - name: postgresql
+    repository: oci://registry-1.docker.io/bitnamicharts
+    version: "16.x.x"
+    condition: postgresql.enabled
