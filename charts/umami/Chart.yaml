@@ -2,7 +2,7 @@ apiVersion: v2
 name: umami
 description: A Helm chart to deploy Umami (analytics) with PostgreSQL via Bitnami subchart.
 type: application
-version: 0.2.0
+version: 0.2.1
 appVersion: "2.19.0"
 
 dependencies:
